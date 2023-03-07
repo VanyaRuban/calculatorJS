@@ -1,13 +1,15 @@
 const buttons = document.querySelectorAll('span')
 const inputResult = document.querySelector('.result p')
-let stringForCalculation;
+
+let hiddenString = '';
 
 for (let i = 0; i < buttons.length; i++) {
-  buttons[i].addEventListener('click', append);
+  buttons[i].addEventListener('click', handleEvent);
 }
 
-function append() {
+function handleEvent() {
   const content = this.textContent
+
   if (content === '=') {
     calculateResult()
   } else if (content === 'AC') {
@@ -18,32 +20,32 @@ function append() {
 }
 
 function calculateResult() {
-  // debugger
-  const stringCalcul = stringForCalculation.replace(/[^-()\d/*+.]/g, '')
+  let calculatedResult = eval(hiddenString).toFixed(4);
   clearInput()
-  inputResult.append(eval(stringCalcul))
+  appendToInputResult(calculatedResult);
+  hiddenString = calculatedResult.toString();
 }
 
 function clearInput() {
   inputResult.innerHTML = '';
-  stringForCalculation = '';
+  hiddenString = '';
 }
 
-function appendToInput(content) {
-  inputResult.append(content)
-  let cnt;
-  if (content === '÷' || content === 'x') {
-    cnt = replaceSymbol(content)
-  } else {
-    cnt = content
-  }
-  stringForCalculation += cnt
+function appendToInput(value) {
+  if(validationNextEvent(value)) { return }
+
+  appendToInputResult(value)
+  hiddenString += (value === '÷' || value === 'x') ? replaceSymbol(value) : value
+}
+
+function validationNextEvent(value) {
+  return hiddenString !== '' && isNaN(hiddenString[hiddenString.length-1]) && isNaN(value)
 }
 
 function replaceSymbol(content) {
-  if (content === '÷') {
-    return '/'
-  } else {
-    return '*'
-  }
+  return content === '÷' ? '/' : '*';
+}
+
+function appendToInputResult(char) {
+  inputResult.append(char);
 }
